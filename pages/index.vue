@@ -65,6 +65,8 @@
         :hasLightBG="hasLightBG"
         :downloadKey="downloadKey"
         :pubKeyIsValid="pubKeyIsValid"
+        :profileType="profileType"
+        :teamMembers="teamMembers"
       />
     </transition>
 
@@ -212,6 +214,40 @@
         </div>
         <div id="step-2" class="mt-16">
           <h2 class="font-extrabold text-2xl">Contact information</h2>
+
+          <!-- Profile Type Selector -->
+          <div class="stepC mt-6">
+            <label class="ml-4 block mb-2">Profile Type</label>
+            <div class="flex gap-4">
+              <label class="flex items-center cursor-pointer px-4 py-3 rounded border transition-colors duration-200"
+                :class="profileType === 'individual' ? 'border-blue-500 bg-blue-900 bg-opacity-20' : 'border-gray-700 hover:border-gray-600'">
+                <input
+                  type="radio"
+                  value="individual"
+                  v-model="profileType"
+                  class="mr-3"
+                />
+                <div>
+                  <div class="font-semibold">Individual Profile</div>
+                  <div class="text-sm text-gray-400">For personal business cards</div>
+                </div>
+              </label>
+              <label class="flex items-center cursor-pointer px-4 py-3 rounded border transition-colors duration-200"
+                :class="profileType === 'business' ? 'border-blue-500 bg-blue-900 bg-opacity-20' : 'border-gray-700 hover:border-gray-600'">
+                <input
+                  type="radio"
+                  value="business"
+                  v-model="profileType"
+                  class="mr-3"
+                />
+                <div>
+                  <div class="font-semibold">Business Profile</div>
+                  <div class="text-sm text-gray-400">For companies with team members</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
           <Attachment
             :content="images"
             type="photo"
@@ -687,6 +723,18 @@
             </p>
           </div>
         </div>
+
+        <!-- Team Members Section - Only for Business Profiles -->
+        <div v-if="profileType === 'business'" id="step-5-5" class="mt-16">
+          <h2 class="font-extrabold text-2xl">Team Members</h2>
+          <p class="mt-4 text-gray-400">
+            Add team members or employees to your business profile. Visitors can click on team members to view their individual profiles.
+          </p>
+          <div class="stepC mt-6">
+            <TeamMemberEditor v-model="teamMembers" />
+          </div>
+        </div>
+
         <div id="step-6" class="mt-16">
           <h2 class="font-extrabold text-2xl">Footer credit</h2>
           <div class="stepC mt-6">
@@ -1056,6 +1104,7 @@ import Download from '@/components/Download'
 import Help from '@/components/Help'
 import Footer from '@/components/Footer'
 import Cropper from '@/components/Cropper'
+import TeamMemberEditor from '@/components/TeamMemberEditor'
 
 import Vcard from '@/components/Vcard'
 import JSZip from 'jszip'
@@ -1082,6 +1131,7 @@ export default {
     Footer,
     Vcard,
     draggable,
+    TeamMemberEditor,
   },
 
   data() {
@@ -1142,6 +1192,7 @@ export default {
           openPalette: false,
         },
       },
+      profileType: 'individual', // 'individual' or 'business'
       genInfo: {
         fname: null,
         lname: null,
@@ -1155,6 +1206,7 @@ export default {
         fontLink: null,
         fontCss: null,
       },
+      teamMembers: [], // For business profiles - stores individual profile data
       primaryActions: [],
       filterPrimary: '',
       secondaryActions: [],
@@ -1910,7 +1962,14 @@ export default {
     },
     addAction(type, name) {
       let index = this.actions[type].findIndex((e) => e.name === name)
-      this[type].push(this.actions[type][index])
+      let action = { ...this.actions[type][index] }
+      // Add new display format properties
+      if (type === 'primaryActions') {
+        action.displayFormat = action.displayFormat || 'row' // 'icon-only' or 'row'
+        action.buttonText = action.buttonText || null // Optional button text
+        action.showValue = action.showValue !== undefined ? action.showValue : true // Show the value (email, phone, etc)
+      }
+      this[type].push(action)
       this.actions[type].splice(index, 1)
       this.clearFilterActions()
     },

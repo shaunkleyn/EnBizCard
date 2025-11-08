@@ -230,18 +230,19 @@
                       target="_blank"
                       rel="noopener noreferrer"
                       :style="{
-                        backgroundColor: `${colors.buttonBg.color}`,
+                        backgroundColor: item.iconBgColor || colors.buttonBg.color,
                       }"
                       :aria-label="item.name"
                     >
                       <div
-                        class="icon iconColor"
+                        class="icon"
+                        :style="{ fill: item.iconColor || 'currentColor' }"
                         v-html="
                           require(`~/assets/icons/${item.icon}.svg?include`)
                         "
                       ></div>
                     </a>
-                    <p class="textColor">
+                    <p v-if="item.showTitle !== false" class="textColor">
                       {{
                         item.name.substr(0, 1).toUpperCase() + item.name.slice(1)
                       }}
@@ -259,14 +260,15 @@
                   :style="{ backgroundColor: `${colors.cardBg.color}` }"
                 >
                   <div class="action-row-content">
-                    <div class="action-row-icon" :style="{ backgroundColor: `${colors.buttonBg.color}` }">
+                    <div class="action-row-icon" :style="{ backgroundColor: item.iconBgColor || colors.buttonBg.color }">
                       <div
-                        class="icon iconColor"
+                        class="icon"
+                        :style="{ fill: item.iconColor || 'currentColor' }"
                         v-html="require(`~/assets/icons/${item.icon}.svg?include`)"
                       ></div>
                     </div>
-                    <div class="action-row-text textColor">
-                      <div class="action-row-label">{{ item.name }}</div>
+                    <div class="action-row-text textColor" v-if="item.showTitle !== false || (item.showValue && item.value)">
+                      <div class="action-row-label" v-if="item.showTitle !== false">{{ item.name }}</div>
                       <div class="action-row-value" v-if="item.showValue && item.value">
                         {{ item.value }}
                       </div>
@@ -277,9 +279,9 @@
                       target="_blank"
                       rel="noopener noreferrer"
                       class="action-row-button"
-                      :style="{ backgroundColor: `${colors.buttonBg.color}` }"
+                      :style="{ backgroundColor: item.iconBgColor || colors.buttonBg.color, color: item.iconColor || 'currentColor' }"
                     >
-                      <span class="iconColor">{{ item.buttonText }}</span>
+                      <span>{{ item.buttonText }}</span>
                     </a>
                     <a
                       v-else

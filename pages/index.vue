@@ -1980,6 +1980,20 @@ export default {
   },
   methods: {
     ...mapActions(['changeTheme']),
+    initializePrimaryActionsDefaults() {
+      // Initialize default icon customization properties for primary actions
+      this.primaryActions.forEach((action) => {
+        if (!action.iconColor) {
+          this.$set(action, 'iconColor', '#ffffff')
+        }
+        if (!action.iconBgColor) {
+          this.$set(action, 'iconBgColor', this.colors.buttonBg.color || '#000000')
+        }
+        if (action.showTitle === undefined) {
+          this.$set(action, 'showTitle', true)
+        }
+      })
+    },
     togglePreview() {
       this.opening = true
       let c = this.$refs.container
@@ -2312,6 +2326,8 @@ export default {
   },
   mounted() {
     window.addEventListener('scroll', this.checkView)
+    // Initialize default icon customization properties for primary actions
+    this.initializePrimaryActionsDefaults()
     // window.onbeforeunload = function () {
     //   return 'Your work will be lost.'
     // }

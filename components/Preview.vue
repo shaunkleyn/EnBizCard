@@ -315,74 +315,147 @@
               v-for="(item, index) in featured"
               :key="'fc' + index"
             >
-              <h2 class="section textColor" v-if="item.title">
-                {{ item.title }}
-              </h2>
-              <div v-for="(item, i) in item.content" :key="i">
-                <div
-                  v-if="item.contentType == 'media'"
-                  class="media"
-                  :class="item.type"
-                  :style="{ backgroundColor: `${colors.cardBg.color}` }"
-                >
-                  <div v-if="item.type == 'image'">
-                    <img
-                      v-if="item.dataURI"
-                      :src="
-                        PreviewMode
-                          ? item.dataURI
-                          : `./media/${getTitle(item.title)}.${item.ext}`
-                      "
-                      alt="Product image"
-                    />
-                    <div class="controls cardColor">
-                      <p class="title">
-                        {{ item.title }}
-                      </p>
+              <CollapsibleSection
+                v-if="item.title"
+                :title="item.title"
+                :default-expanded="true"
+                heading-tag="h2"
+                title-class="section textColor"
+                :storage-key="'preview-featured-' + index"
+              >
+                <div v-for="(item, i) in item.content" :key="i">
+                  <div
+                    v-if="item.contentType == 'media'"
+                    class="media"
+                    :class="item.type"
+                    :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  >
+                    <div v-if="item.type == 'image'">
+                      <img
+                        v-if="item.dataURI"
+                        :src="
+                          PreviewMode
+                            ? item.dataURI
+                            : `./media/${getTitle(item.title)}.${item.ext}`
+                        "
+                        alt="Product image"
+                      />
+                      <div class="controls cardColor">
+                        <p class="title">
+                          {{ item.title }}
+                        </p>
+                      </div>
                     </div>
+                    <MediaPlayer
+                      v-if="item.type == 'music' || item.type == 'video'"
+                      ref="mediaPlayer"
+                      :media="item"
+                      :type="item.type"
+                      :colors="colors"
+                      :togglePlay="togglePlay"
+                      :PreviewMode="PreviewMode"
+                    />
+                    <DocumentDownloader
+                      v-if="item.type == 'document'"
+                      :media="item"
+                      :type="item.type"
+                      :colors="colors"
+                      :PreviewMode="PreviewMode"
+                    />
                   </div>
-                  <MediaPlayer
-                    v-if="item.type == 'music' || item.type == 'video'"
-                    ref="mediaPlayer"
-                    :media="item"
-                    :type="item.type"
-                    :colors="colors"
-                    :togglePlay="togglePlay"
-                    :PreviewMode="PreviewMode"
-                  />
-                  <DocumentDownloader
-                    v-if="item.type == 'document'"
-                    :media="item"
-                    :type="item.type"
+                  <ProductShowcase
+                    v-else-if="item.contentType == 'product'"
+                    :product="item"
                     :colors="colors"
                     :PreviewMode="PreviewMode"
                   />
+                  <div
+                    v-else-if="item.contentType == 'text' && item.value"
+                    class="media"
+                    :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  >
+                    <p class="textC cardColor">{{ item.value }}</p>
+                  </div>
+                  <div
+                    v-else-if="stripAttr(item)"
+                    class="media embedded"
+                    :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  >
+                    <iframe
+                      :src="stripAttr(item)"
+                      frameborder="0"
+                      allowfullscreen
+                    ></iframe>
+                  </div>
                 </div>
-                <ProductShowcase
-                  v-else-if="item.contentType == 'product'"
-                  :product="item"
-                  :colors="colors"
-                  :PreviewMode="PreviewMode"
-                />
-                <div
-                  v-else-if="item.contentType == 'text' && item.value"
-                  class="media"
-                  :style="{ backgroundColor: `${colors.cardBg.color}` }"
-                >
-                  <p class="textC cardColor">{{ item.value }}</p>
+              </CollapsibleSection>
+              <template v-else>
+                <div v-for="(item, i) in item.content" :key="i">
+                  <div
+                    v-if="item.contentType == 'media'"
+                    class="media"
+                    :class="item.type"
+                    :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  >
+                    <div v-if="item.type == 'image'">
+                      <img
+                        v-if="item.dataURI"
+                        :src="
+                          PreviewMode
+                            ? item.dataURI
+                            : `./media/${getTitle(item.title)}.${item.ext}`
+                        "
+                        alt="Product image"
+                      />
+                      <div class="controls cardColor">
+                        <p class="title">
+                          {{ item.title }}
+                        </p>
+                      </div>
+                    </div>
+                    <MediaPlayer
+                      v-if="item.type == 'music' || item.type == 'video'"
+                      ref="mediaPlayer"
+                      :media="item"
+                      :type="item.type"
+                      :colors="colors"
+                      :togglePlay="togglePlay"
+                      :PreviewMode="PreviewMode"
+                    />
+                    <DocumentDownloader
+                      v-if="item.type == 'document'"
+                      :media="item"
+                      :type="item.type"
+                      :colors="colors"
+                      :PreviewMode="PreviewMode"
+                    />
+                  </div>
+                  <ProductShowcase
+                    v-else-if="item.contentType == 'product'"
+                    :product="item"
+                    :colors="colors"
+                    :PreviewMode="PreviewMode"
+                  />
+                  <div
+                    v-else-if="item.contentType == 'text' && item.value"
+                    class="media"
+                    :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  >
+                    <p class="textC cardColor">{{ item.value }}</p>
+                  </div>
+                  <div
+                    v-else-if="stripAttr(item)"
+                    class="media embedded"
+                    :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  >
+                    <iframe
+                      :src="stripAttr(item)"
+                      frameborder="0"
+                      allowfullscreen
+                    ></iframe>
+                  </div>
                 </div>
-                <div
-                  v-else-if="stripAttr(item)"
-                  class="media embedded"
-                  :style="{ backgroundColor: `${colors.cardBg.color}` }"
-                >
-                  <iframe
-                    :src="stripAttr(item)"
-                    frameborder="0"
-                    allowfullscreen
-                  ></iframe>
-                </div>
-              </div>
+              </template>
             </div>
 
             <!-- Team Members Section for Business Profiles -->
@@ -390,34 +463,41 @@
               v-if="profileType === 'business' && teamMembers && teamMembers.length > 0"
               class="team-members-section"
             >
-              <h2 class="section textColor">Our Team</h2>
-              <div class="team-members-grid">
-                <div
-                  v-for="(member, index) in teamMembers"
-                  :key="'team-' + index"
-                  class="team-member-card"
-                  :style="{ backgroundColor: `${colors.cardBg.color}` }"
-                  @click="openProfilePopup(member)"
-                >
-                  <div class="team-member-photo" v-if="member.photo">
-                    <img :src="member.photo" :alt="member.fname + ' ' + member.lname" />
-                  </div>
-                  <div class="team-member-photo-placeholder" v-else>
-                    <div
-                      class="icon textColor"
-                      v-html="require(`~/assets/icons/add-user.svg?include`)"
-                    ></div>
-                  </div>
-                  <div class="team-member-info">
-                    <h3 class="team-member-name textColor">
-                      {{ member.fname }} {{ member.lname }}
-                    </h3>
-                    <p v-if="member.title" class="team-member-title textColor">
-                      {{ member.title }}
-                    </p>
+              <CollapsibleSection
+                title="Our Team"
+                :default-expanded="true"
+                heading-tag="h2"
+                title-class="section textColor"
+                storage-key="preview-team-members"
+              >
+                <div class="team-members-grid">
+                  <div
+                    v-for="(member, index) in teamMembers"
+                    :key="'team-' + index"
+                    class="team-member-card"
+                    :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                    @click="openProfilePopup(member)"
+                  >
+                    <div class="team-member-photo" v-if="member.photo">
+                      <img :src="member.photo" :alt="member.fname + ' ' + member.lname" />
+                    </div>
+                    <div class="team-member-photo-placeholder" v-else>
+                      <div
+                        class="icon textColor"
+                        v-html="require(`~/assets/icons/add-user.svg?include`)"
+                      ></div>
+                    </div>
+                    <div class="team-member-info">
+                      <h3 class="team-member-name textColor">
+                        {{ member.fname }} {{ member.lname }}
+                      </h3>
+                      <p v-if="member.title" class="team-member-title textColor">
+                        {{ member.title }}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </CollapsibleSection>
             </div>
 
             <!-- Profile Popup -->
@@ -452,6 +532,7 @@ import MediaPlayer from './MediaPlayer'
 import DocumentDownloader from './DocumentDownloader'
 import ProductShowcase from './ProductShowcase'
 import ProfilePopup from './ProfilePopup'
+import CollapsibleSection from './CollapsibleSection'
 import utils from '@/mixins/utils'
 import { mapState } from 'vuex'
 
@@ -480,6 +561,7 @@ export default {
     DocumentDownloader,
     ProductShowcase,
     ProfilePopup,
+    CollapsibleSection,
   },
   watch: {
     getFeaturedMusic(oldv, newv) {

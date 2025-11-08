@@ -175,166 +175,180 @@
               "
               alt="Photo"
             />
-            <div id="info" class="textColor">
-              <p class="name">
-                {{ getFullname }}
-              </p>
-              <p v-if="genInfo.pronouns" class="pronouns">
-                ({{ genInfo.pronouns }})
-              </p>
-              <p class="jobtitle">
-                {{ genInfo.title }}
-              </p>
-              <p class="bizname">
-                {{ genInfo.biz }}
-              </p>
-              <p class="bizaddr" v-if="genInfo.addr">
-                {{ genInfo.addr }}
-              </p>
-            </div>
-            <p class="sub textColor" v-if="genInfo.desc">
-              {{ genInfo.desc }}
-            </p>
-            <a
-              id="cta"
-              rel="noreferrer"
-              :href="!PreviewMode && `${username}.vcf`"
-              download
-              target="_blank"
-              :style="{ backgroundColor: `${colors.buttonBg.color}` }"
-              @click.prevent="downloadVcard"
-              aria-label="Save Contact"
-            >
-              <div
-                class="icon iconColor"
-                v-html="require(`~/assets/icons/add-user.svg?include`)"
-              ></div>
-              <p class="iconColor">Save Contact</p>
-            </a>
-            <div class="actions">
-              <div
-                class="actionsC"
-                v-for="(item, index) in primaryActions"
-                :key="'pa' + index"
-              >
-                <div class="actionBtn">
-                  <a
-                    :href="getHref(item)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    :style="{
-                      backgroundColor: `${colors.buttonBg.color}`,
-                    }"
-                    :aria-label="item.name"
-                  >
-                    <div
-                      class="icon iconColor"
-                      v-html="
-                        require(`~/assets/icons/${item.icon}.svg?include`)
-                      "
-                    ></div>
-                  </a>
-                  <p class="textColor">
-                    {{
-                      item.name.substr(0, 1).toUpperCase() + item.name.slice(1)
-                    }}
+            <template v-for="section in sectionOrder">
+              <template v-if="section.id === 'contact-info'">
+                <div :key="section.id + '-info'" id="info" class="textColor">
+                  <p class="name">
+                    {{ getFullname }}
+                  </p>
+                  <p v-if="genInfo.pronouns" class="pronouns">
+                    ({{ genInfo.pronouns }})
+                  </p>
+                  <p class="jobtitle">
+                    {{ genInfo.title }}
+                  </p>
+                  <p class="bizname">
+                    {{ genInfo.biz }}
+                  </p>
+                  <p class="bizaddr" v-if="genInfo.addr">
+                    {{ genInfo.addr }}
                   </p>
                 </div>
-              </div>
-            </div>
-            <div class="actions secondary">
+                <p :key="section.id + '-desc'" class="sub textColor" v-if="genInfo.desc">
+                  {{ genInfo.desc }}
+                </p>
+                <a
+                  :key="section.id + '-cta'"
+                  id="cta"
+                  rel="noreferrer"
+                  :href="!PreviewMode && `${username}.vcf`"
+                  download
+                  target="_blank"
+                  :style="{ backgroundColor: `${colors.buttonBg.color}` }"
+                  @click.prevent="downloadVcard"
+                  aria-label="Save Contact"
+                >
+                  <div
+                    class="icon iconColor"
+                    v-html="require(`~/assets/icons/add-user.svg?include`)"
+                  ></div>
+                  <p class="iconColor">Save Contact</p>
+                </a>
+              </template>
               <div
-                class="actionsC"
-                v-for="(item, index) in secondaryActions"
-                :key="'sa' + index"
+                v-else-if="section.id === 'primary-actions'"
+                :key="section.id"
+                class="actions"
               >
-                <div class="actionBtn secBtn">
-                  <a
-                    :href="getHref(item)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    :style="{ background: item.color }"
-                    :aria-label="item.name"
-                  >
-                    <div class="icon" v-html="getSVG(item)"></div>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div
-              class="featured"
-              v-for="(item, index) in featured"
-              :key="'fc' + index"
-            >
-              <h2 class="section textColor" v-if="item.title">
-                {{ item.title }}
-              </h2>
-              <div v-for="(item, i) in item.content" :key="i">
                 <div
-                  v-if="item.contentType == 'media'"
-                  class="media"
-                  :class="item.type"
-                  :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  class="actionsC"
+                  v-for="(item, index) in primaryActions"
+                  :key="'pa' + index"
                 >
-                  <div v-if="item.type == 'image'">
-                    <img
-                      v-if="item.dataURI"
-                      :src="
-                        PreviewMode
-                          ? item.dataURI
-                          : `./media/${getTitle(item.title)}.${item.ext}`
-                      "
-                      alt="Product image"
-                    />
-                    <div class="controls cardColor">
-                      <p class="title">
-                        {{ item.title }}
-                      </p>
-                    </div>
+                  <div class="actionBtn">
+                    <a
+                      :href="getHref(item)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      :style="{
+                        backgroundColor: `${colors.buttonBg.color}`,
+                      }"
+                      :aria-label="item.name"
+                    >
+                      <div
+                        class="icon iconColor"
+                        v-html="
+                          require(`~/assets/icons/${item.icon}.svg?include`)
+                        "
+                      ></div>
+                    </a>
+                    <p class="textColor">
+                      {{
+                        item.name.substr(0, 1).toUpperCase() + item.name.slice(1)
+                      }}
+                    </p>
                   </div>
-                  <MediaPlayer
-                    v-if="item.type == 'music' || item.type == 'video'"
-                    ref="mediaPlayer"
-                    :media="item"
-                    :type="item.type"
-                    :colors="colors"
-                    :togglePlay="togglePlay"
-                    :PreviewMode="PreviewMode"
-                  />
-                  <DocumentDownloader
-                    v-if="item.type == 'document'"
-                    :media="item"
-                    :type="item.type"
-                    :colors="colors"
-                    :PreviewMode="PreviewMode"
-                  />
-                </div>
-                <ProductShowcase
-                  v-else-if="item.contentType == 'product' && item.title"
-                  :product="item"
-                  :colors="colors"
-                  :PreviewMode="PreviewMode"
-                />
-                <div
-                  v-else-if="item.contentType == 'text' && item.value"
-                  class="media"
-                  :style="{ backgroundColor: `${colors.cardBg.color}` }"
-                >
-                  <p class="textC cardColor">{{ item.value }}</p>
-                </div>
-                <div
-                  v-else-if="stripAttr(item)"
-                  class="media embedded"
-                  :style="{ backgroundColor: `${colors.cardBg.color}` }"
-                >
-                  <iframe
-                    :src="stripAttr(item)"
-                    frameborder="0"
-                    allowfullscreen
-                  ></iframe>
                 </div>
               </div>
-            </div>
+              <div
+                v-else-if="section.id === 'secondary-actions'"
+                :key="section.id"
+                class="actions secondary"
+              >
+                <div
+                  class="actionsC"
+                  v-for="(item, index) in secondaryActions"
+                  :key="'sa' + index"
+                >
+                  <div class="actionBtn secBtn">
+                    <a
+                      :href="getHref(item)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      :style="{ background: item.color }"
+                      :aria-label="item.name"
+                    >
+                      <div class="icon" v-html="getSVG(item)"></div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div
+                v-else-if="section.id === 'featured-content'"
+                :key="section.id + '-' + index"
+                class="featured"
+                v-for="(item, index) in featured"
+              >
+                <h2 class="section textColor" v-if="item.title">
+                  {{ item.title }}
+                </h2>
+                <div v-for="(item, i) in item.content" :key="i">
+                  <div
+                    v-if="item.contentType == 'media'"
+                    class="media"
+                    :class="item.type"
+                    :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  >
+                    <div v-if="item.type == 'image'">
+                      <img
+                        v-if="item.dataURI"
+                        :src="
+                          PreviewMode
+                            ? item.dataURI
+                            : `./media/${getTitle(item.title)}.${item.ext}`
+                        "
+                        alt="Product image"
+                      />
+                      <div class="controls cardColor">
+                        <p class="title">
+                          {{ item.title }}
+                        </p>
+                      </div>
+                    </div>
+                    <MediaPlayer
+                      v-if="item.type == 'music' || item.type == 'video'"
+                      ref="mediaPlayer"
+                      :media="item"
+                      :type="item.type"
+                      :colors="colors"
+                      :togglePlay="togglePlay"
+                      :PreviewMode="PreviewMode"
+                    />
+                    <DocumentDownloader
+                      v-if="item.type == 'document'"
+                      :media="item"
+                      :type="item.type"
+                      :colors="colors"
+                      :PreviewMode="PreviewMode"
+                    />
+                  </div>
+                  <ProductShowcase
+                    v-else-if="item.contentType == 'product' && item.title"
+                    :product="item"
+                    :colors="colors"
+                    :PreviewMode="PreviewMode"
+                  />
+                  <div
+                    v-else-if="item.contentType == 'text' && item.value"
+                    class="media"
+                    :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  >
+                    <p class="textC cardColor">{{ item.value }}</p>
+                  </div>
+                  <div
+                    v-else-if="stripAttr(item)"
+                    class="media embedded"
+                    :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  >
+                    <iframe
+                      :src="stripAttr(item)"
+                      frameborder="0"
+                      allowfullscreen
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+            </template>
           </main>
           <footer
             v-if="footerCredit"
@@ -372,6 +386,7 @@ export default {
     'colors',
     'primaryActions',
     'secondaryActions',
+    'sectionOrder',
     'PreviewMode',
     'downloadVcard',
     'downloadKey',

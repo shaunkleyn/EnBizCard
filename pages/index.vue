@@ -58,6 +58,7 @@
         :colors="colors"
         :primaryActions="primaryActions"
         :secondaryActions="secondaryActions"
+        :sectionOrder="sectionOrder"
         :PreviewMode="PreviewMode"
         :downloadVcard="downloadVcard"
         :footerCredit="footerCredit"
@@ -210,8 +211,32 @@
             </p>
           </div>
         </div>
-        <div id="step-2" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Contact information</h2>
+        <draggable
+          v-model="sectionOrder"
+          handle=".section-drag"
+          animation="150"
+          ghostClass="ghost"
+        >
+          <transition-group type="transition" name="list">
+            <div
+              v-for="section in sectionOrder"
+              :key="section.id"
+              class="section-wrapper"
+            >
+              <div v-if="section.id === 'contact-info'" id="step-2" class="mt-16">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="font-extrabold text-2xl">Contact information</h2>
+                  <button
+                    class="section-drag p-2 cursor-move focus:outline-none"
+                    tabindex="-1"
+                    aria-label="Drag to reorder section"
+                  >
+                    <div
+                      class="w-6 h-6"
+                      v-html="require(`~/assets/icons/drag.svg?include`)"
+                    ></div>
+                  </button>
+                </div>
           <Attachment
             :content="images"
             type="photo"
@@ -426,9 +451,21 @@
               placeholder="Paste public key block here"
             ></textarea>
           </div>
-        </div>
-        <div id="step-3" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Primary actions</h2>
+              </div>
+              <div v-else-if="section.id === 'primary-actions'" id="step-3" class="mt-16">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="font-extrabold text-2xl">Primary actions</h2>
+                  <button
+                    class="section-drag p-2 cursor-move focus:outline-none"
+                    tabindex="-1"
+                    aria-label="Drag to reorder section"
+                  >
+                    <div
+                      class="w-6 h-6"
+                      v-html="require(`~/assets/icons/drag.svg?include`)"
+                    ></div>
+                  </button>
+                </div>
           <draggable
             v-model="primaryActions"
             handle=".drag"
@@ -530,9 +567,21 @@
               </button>
             </div>
           </div>
-        </div>
-        <div id="step-4" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Secondary actions</h2>
+              </div>
+              <div v-else-if="section.id === 'secondary-actions'" id="step-4" class="mt-16">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="font-extrabold text-2xl">Secondary actions</h2>
+                  <button
+                    class="section-drag p-2 cursor-move focus:outline-none"
+                    tabindex="-1"
+                    aria-label="Drag to reorder section"
+                  >
+                    <div
+                      class="w-6 h-6"
+                      v-html="require(`~/assets/icons/drag.svg?include`)"
+                    ></div>
+                  </button>
+                </div>
           <draggable
             v-model="secondaryActions"
             handle=".drag"
@@ -636,9 +685,21 @@
           </div>
           <!-- class="stepC actions mt-6 border-gray-800"
             :class="{ 'border-t pt-6': secondaryActions.length }" -->
-        </div>
-        <div id="step-5" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Featured content</h2>
+              </div>
+              <div v-else-if="section.id === 'featured-content'" id="step-5" class="mt-16">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="font-extrabold text-2xl">Featured content</h2>
+                  <button
+                    class="section-drag p-2 cursor-move focus:outline-none"
+                    tabindex="-1"
+                    aria-label="Drag to reorder section"
+                  >
+                    <div
+                      class="w-6 h-6"
+                      v-html="require(`~/assets/icons/drag.svg?include`)"
+                    ></div>
+                  </button>
+                </div>
           <div class="stepC">
             <draggable
               v-model="featured"
@@ -686,7 +747,10 @@
               Supported media formats: jpeg, png, mp3, mp4, webm and pdf
             </p>
           </div>
-        </div>
+              </div>
+            </div>
+          </transition-group>
+        </draggable>
         <div id="step-6" class="mt-16">
           <h2 class="font-extrabold text-2xl">Footer credit</h2>
           <div class="stepC mt-6">
@@ -1027,6 +1091,7 @@
                 :colors="colors"
                 :primaryActions="primaryActions"
                 :secondaryActions="secondaryActions"
+                :sectionOrder="sectionOrder"
                 :PreviewMode="PreviewMode"
                 :downloadVcard="downloadVcard"
                 :footerCredit="footerCredit"
@@ -1159,6 +1224,12 @@ export default {
       filterPrimary: '',
       secondaryActions: [],
       filterSecondary: '',
+      sectionOrder: [
+        { id: 'contact-info', name: 'Contact information' },
+        { id: 'primary-actions', name: 'Primary actions' },
+        { id: 'secondary-actions', name: 'Secondary actions' },
+        { id: 'featured-content', name: 'Featured content' },
+      ],
       actions: {
         primaryActions: [
           {

@@ -212,10 +212,11 @@
               <p class="iconColor">Save Contact</p>
             </a>
             <div class="actions">
+              <!-- Icon-only actions -->
               <div
                 class="actionsC"
-                v-for="(item, index) in primaryActions"
-                :key="'pa' + index"
+                v-for="(item, index) in primaryActions.filter(a => a.displayFormat === 'icon-only')"
+                :key="'pa-icon-' + index"
               >
                 <div class="actionBtn">
                   <a
@@ -239,6 +240,54 @@
                       item.name.substr(0, 1).toUpperCase() + item.name.slice(1)
                     }}
                   </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row format actions -->
+            <div class="actions-row" v-if="primaryActions.filter(a => a.displayFormat === 'row').length > 0">
+              <div
+                class="action-row-item"
+                v-for="(item, index) in primaryActions.filter(a => a.displayFormat === 'row')"
+                :key="'pa-row-' + index"
+                :style="{ backgroundColor: `${colors.cardBg.color}` }"
+              >
+                <div class="action-row-content">
+                  <div class="action-row-icon" :style="{ backgroundColor: `${colors.buttonBg.color}` }">
+                    <div
+                      class="icon iconColor"
+                      v-html="require(`~/assets/icons/${item.icon}.svg?include`)"
+                    ></div>
+                  </div>
+                  <div class="action-row-text textColor">
+                    <div class="action-row-label">{{ item.name }}</div>
+                    <div class="action-row-value" v-if="item.showValue && item.value">
+                      {{ item.value }}
+                    </div>
+                  </div>
+                  <a
+                    v-if="item.buttonText"
+                    :href="getHref(item)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="action-row-button"
+                    :style="{ backgroundColor: `${colors.buttonBg.color}` }"
+                  >
+                    <span class="iconColor">{{ item.buttonText }}</span>
+                  </a>
+                  <a
+                    v-else
+                    :href="getHref(item)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="action-row-link-icon"
+                    :aria-label="'Open ' + item.name"
+                  >
+                    <div
+                      class="icon textColor"
+                      v-html="require(`~/assets/icons/arrow-right.svg?include`)"
+                    ></div>
+                  </a>
                 </div>
               </div>
             </div>
@@ -310,7 +359,7 @@
                   />
                 </div>
                 <ProductShowcase
-                  v-else-if="item.contentType == 'product' && item.title"
+                  v-else-if="item.contentType == 'product'"
                   :product="item"
                   :colors="colors"
                   :PreviewMode="PreviewMode"
@@ -335,6 +384,48 @@
                 </div>
               </div>
             </div>
+
+            <!-- Team Members Section for Business Profiles -->
+            <div
+              v-if="profileType === 'business' && teamMembers && teamMembers.length > 0"
+              class="team-members-section"
+            >
+              <h2 class="section textColor">Our Team</h2>
+              <div class="team-members-grid">
+                <div
+                  v-for="(member, index) in teamMembers"
+                  :key="'team-' + index"
+                  class="team-member-card"
+                  :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                  @click="openProfilePopup(member)"
+                >
+                  <div class="team-member-photo" v-if="member.photo">
+                    <img :src="member.photo" :alt="member.fname + ' ' + member.lname" />
+                  </div>
+                  <div class="team-member-photo-placeholder" v-else>
+                    <div
+                      class="icon textColor"
+                      v-html="require(`~/assets/icons/add-user.svg?include`)"
+                    ></div>
+                  </div>
+                  <div class="team-member-info">
+                    <h3 class="team-member-name textColor">
+                      {{ member.fname }} {{ member.lname }}
+                    </h3>
+                    <p v-if="member.title" class="team-member-title textColor">
+                      {{ member.title }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Popup -->
+            <ProfilePopup
+              :show="showProfilePopup"
+              :profile="selectedProfile"
+              @close="closeProfilePopup"
+            />
           </main>
           <footer
             v-if="footerCredit"
@@ -360,6 +451,7 @@
 import MediaPlayer from './MediaPlayer'
 import DocumentDownloader from './DocumentDownloader'
 import ProductShowcase from './ProductShowcase'
+import ProfilePopup from './ProfilePopup'
 import utils from '@/mixins/utils'
 import { mapState } from 'vuex'
 
@@ -379,12 +471,15 @@ export default {
     'showAlert',
     'hasLightBG',
     'pubKeyIsValid',
+    'profileType',
+    'teamMembers',
   ],
   mixins: [utils],
   components: {
     MediaPlayer,
     DocumentDownloader,
     ProductShowcase,
+    ProfilePopup,
   },
   watch: {
     getFeaturedMusic(oldv, newv) {
@@ -395,6 +490,8 @@ export default {
     return {
       paused: [],
       hasInstagramEmbed: false,
+      showProfilePopup: false,
+      selectedProfile: null,
     }
   },
   computed: {
@@ -503,6 +600,58 @@ export default {
           }
         }
       })
+    },
+    openProfilePopup(member) {
+      // Convert team member data to profile format for the popup
+      const profile = {
+        genInfo: {
+          fname: member.fname,
+          lname: member.lname,
+          pronouns: member.pronouns,
+          title: member.title,
+          desc: member.desc,
+        },
+        images: {
+          photo: {
+            url: member.photo
+          }
+        },
+        primaryActions: [],
+        secondaryActions: []
+      }
+
+      // Add contact actions if available
+      if (member.email) {
+        profile.primaryActions.push({
+          name: 'Email',
+          icon: 'email',
+          href: 'mailto:',
+          value: member.email
+        })
+      }
+      if (member.phone) {
+        profile.primaryActions.push({
+          name: 'Phone',
+          icon: 'call',
+          href: 'tel:',
+          value: member.phone
+        })
+      }
+      if (member.linkedin) {
+        profile.secondaryActions.push({
+          name: 'LinkedIn',
+          icon: 'linkedin',
+          color: '#0077B5',
+          value: member.linkedin
+        })
+      }
+
+      this.selectedProfile = profile
+      this.showProfilePopup = true
+    },
+    closeProfilePopup() {
+      this.showProfilePopup = false
+      this.selectedProfile = null
     },
   },
   mounted() {
@@ -755,6 +904,72 @@ export default {
     padding: 1rem;
   }
 
+  // Row format actions
+  .actions-row {
+    width: 100%;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .action-row-item {
+    border-radius: 0.75rem;
+    padding: 1rem;
+    transition: transform 0.2s ease;
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+  .action-row-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .action-row-icon {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .action-row-text {
+    flex: 1;
+    min-width: 0;
+  }
+  .action-row-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+  .action-row-value {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    word-break: break-all;
+  }
+  .action-row-button {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+  .action-row-link-icon {
+    flex-shrink: 0;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    line-height: 0;
+    transition: background-color 0.2s ease;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
   // Featured Content
   .featured {
     display: flex;
@@ -769,6 +984,69 @@ export default {
     font-size: 1.3rem;
     padding: 1rem 0;
   }
+
+  // Team Members Section
+  .team-members-section {
+    margin: 2rem 0;
+    width: 100%;
+  }
+  .team-members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .team-member-card {
+    border-radius: 1rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+  }
+  .team-member-photo,
+  .team-member-photo-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .icon {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+  .team-member-info {
+    text-align: center;
+    width: 100%;
+  }
+  .team-member-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin: 0 0 0.25rem;
+    word-break: break-word;
+  }
+  .team-member-title {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin: 0;
+    word-break: break-word;
+  }
+
   .media {
     overflow: hidden;
     border-radius: 1rem;
@@ -1132,6 +1410,69 @@ export default {
     font-size: 1.3rem;
     padding: 1rem 0;
   }
+
+  // Team Members Section
+  .team-members-section {
+    margin: 2rem 0;
+    width: 100%;
+  }
+  .team-members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .team-member-card {
+    border-radius: 1rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+  }
+  .team-member-photo,
+  .team-member-photo-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .icon {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+  .team-member-info {
+    text-align: center;
+    width: 100%;
+  }
+  .team-member-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin: 0 0 0.25rem;
+    word-break: break-word;
+  }
+  .team-member-title {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin: 0;
+    word-break: break-word;
+  }
+
   .media {
     overflow: hidden;
     border-radius: 0.5rem;

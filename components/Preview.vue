@@ -310,7 +310,7 @@
                   />
                 </div>
                 <ProductShowcase
-                  v-else-if="item.contentType == 'product' && item.title"
+                  v-else-if="item.contentType == 'product'"
                   :product="item"
                   :colors="colors"
                   :PreviewMode="PreviewMode"

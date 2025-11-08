@@ -211,119 +211,130 @@
               ></div>
               <p class="iconColor">Save Contact</p>
             </a>
-            <div class="actions">
-              <!-- Icon-only actions -->
-              <div
-                class="actionsC"
-                v-for="(item, index) in primaryActions.filter(a => a.displayFormat === 'icon-only')"
-                :key="'pa-icon-' + index"
-              >
-                <div class="actionBtn">
-                  <a
-                    :href="getHref(item)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    :style="{
-                      backgroundColor: `${colors.buttonBg.color}`,
-                    }"
-                    :aria-label="item.name"
-                  >
-                    <div
-                      class="icon iconColor"
-                      v-html="
-                        require(`~/assets/icons/${item.icon}.svg?include`)
-                      "
-                    ></div>
-                  </a>
-                  <p class="textColor">
-                    {{
-                      item.name.substr(0, 1).toUpperCase() + item.name.slice(1)
-                    }}
-                  </p>
-                </div>
-              </div>
-            </div>
 
-            <!-- Row format actions -->
-            <div class="actions-row" v-if="primaryActions.filter(a => a.displayFormat === 'row').length > 0">
-              <div
-                class="action-row-item"
-                v-for="(item, index) in primaryActions.filter(a => a.displayFormat === 'row')"
-                :key="'pa-row-' + index"
-                :style="{ backgroundColor: `${colors.cardBg.color}` }"
-              >
-                <div class="action-row-content">
-                  <div class="action-row-icon" :style="{ backgroundColor: `${colors.buttonBg.color}` }">
-                    <div
-                      class="icon iconColor"
-                      v-html="require(`~/assets/icons/${item.icon}.svg?include`)"
-                    ></div>
+            <!-- Dynamic sections based on sectionsOrder -->
+            <template v-for="sectionId in (sectionsOrder || defaultSectionsOrder)">
+              <!-- Contact Info section is fixed at top, so we skip it -->
+
+              <!-- Primary Actions -->
+              <div v-if="sectionId === 'primaryActions'" :key="sectionId" class="actions">
+                <!-- Icon-only actions -->
+                <div
+                  class="actionsC"
+                  v-for="(item, index) in primaryActions.filter(a => a.displayFormat === 'icon-only')"
+                  :key="'pa-icon-' + index"
+                >
+                  <div class="actionBtn">
+                    <a
+                      :href="getHref(item)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      :style="{
+                        backgroundColor: `${colors.buttonBg.color}`,
+                      }"
+                      :aria-label="item.name"
+                    >
+                      <div
+                        class="icon iconColor"
+                        v-html="
+                          require(`~/assets/icons/${item.icon}.svg?include`)
+                        "
+                      ></div>
+                    </a>
+                    <p class="textColor">
+                      {{
+                        item.name.substr(0, 1).toUpperCase() + item.name.slice(1)
+                      }}
+                    </p>
                   </div>
-                  <div class="action-row-text textColor">
-                    <div class="action-row-label">{{ item.name }}</div>
-                    <div class="action-row-value" v-if="item.showValue && item.value">
-                      {{ item.value }}
+                </div>
+              </div>
+
+              <!-- Row format actions for Primary Actions -->
+              <div v-if="sectionId === 'primaryActions' && primaryActions.filter(a => a.displayFormat === 'row').length > 0" :key="sectionId + '-row'" class="actions-row">
+                <div
+                  class="action-row-item"
+                  v-for="(item, index) in primaryActions.filter(a => a.displayFormat === 'row')"
+                  :key="'pa-row-' + index"
+                  :style="{ backgroundColor: `${colors.cardBg.color}` }"
+                >
+                  <div class="action-row-content">
+                    <div class="action-row-icon" :style="{ backgroundColor: `${colors.buttonBg.color}` }">
+                      <div
+                        class="icon iconColor"
+                        v-html="require(`~/assets/icons/${item.icon}.svg?include`)"
+                      ></div>
                     </div>
+                    <div class="action-row-text textColor">
+                      <div class="action-row-label">{{ item.name }}</div>
+                      <div class="action-row-value" v-if="item.showValue && item.value">
+                        {{ item.value }}
+                      </div>
+                    </div>
+                    <a
+                      v-if="item.buttonText"
+                      :href="getHref(item)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="action-row-button"
+                      :style="{ backgroundColor: `${colors.buttonBg.color}` }"
+                    >
+                      <span class="iconColor">{{ item.buttonText }}</span>
+                    </a>
+                    <a
+                      v-else
+                      :href="getHref(item)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="action-row-link-icon"
+                      :aria-label="'Open ' + item.name"
+                    >
+                      <div
+                        class="icon textColor"
+                        v-html="require(`~/assets/icons/arrow-right.svg?include`)"
+                      ></div>
+                    </a>
                   </div>
-                  <a
-                    v-if="item.buttonText"
-                    :href="getHref(item)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="action-row-button"
-                    :style="{ backgroundColor: `${colors.buttonBg.color}` }"
-                  >
-                    <span class="iconColor">{{ item.buttonText }}</span>
-                  </a>
-                  <a
-                    v-else
-                    :href="getHref(item)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="action-row-link-icon"
-                    :aria-label="'Open ' + item.name"
-                  >
-                    <div
-                      class="icon textColor"
-                      v-html="require(`~/assets/icons/arrow-right.svg?include`)"
-                    ></div>
-                  </a>
                 </div>
               </div>
-            </div>
-            <div class="actions secondary">
+
+              <!-- Secondary Actions -->
+              <div v-if="sectionId === 'secondaryActions'" :key="sectionId" class="actions secondary">
+                <div
+                  class="actionsC"
+                  v-for="(item, index) in secondaryActions"
+                  :key="'sa' + index"
+                >
+                  <div class="actionBtn secBtn">
+                    <a
+                      :href="getHref(item)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      :style="{ background: item.color }"
+                      :aria-label="item.name"
+                    >
+                      <div class="icon" v-html="getSVG(item)"></div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Featured Content -->
+              <template v-if="sectionId === 'featured'">
               <div
-                class="actionsC"
-                v-for="(item, index) in secondaryActions"
-                :key="'sa' + index"
+                v-for="(item, index) in featured"
+                :key="sectionId + '-' + index"
+                class="featured"
               >
-                <div class="actionBtn secBtn">
-                  <a
-                    :href="getHref(item)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    :style="{ background: item.color }"
-                    :aria-label="item.name"
-                  >
-                    <div class="icon" v-html="getSVG(item)"></div>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div
-              class="featured"
-              v-for="(item, index) in featured"
-              :key="'fc' + index"
-            >
-              <CollapsibleSection
-                v-if="item.title"
-                :title="item.title"
-                :default-expanded="true"
-                heading-tag="h2"
-                title-class="section textColor"
-                :storage-key="'preview-featured-' + index"
-              >
-                <div v-for="(item, i) in item.content" :key="i">
+                <CollapsibleSection
+                  v-if="item.title"
+                  :title="item.title"
+                  :default-expanded="true"
+                  heading-tag="h2"
+                  title-class="section textColor"
+                  :storage-key="'preview-featured-' + index"
+                >
+                  <div v-for="(item, i) in item.content" :key="i">
                   <div
                     v-if="item.contentType == 'media'"
                     class="media"
@@ -457,10 +468,12 @@
                 </div>
               </template>
             </div>
+            </template>
 
             <!-- Team Members Section for Business Profiles -->
             <div
-              v-if="profileType === 'business' && teamMembers && teamMembers.length > 0"
+              v-if="sectionId === 'teamMembers' && profileType === 'business' && teamMembers && teamMembers.length > 0"
+              :key="sectionId"
               class="team-members-section"
             >
               <CollapsibleSection
@@ -499,6 +512,8 @@
                 </div>
               </CollapsibleSection>
             </div>
+            </template>
+            <!-- End of dynamic sections -->
 
             <!-- Profile Popup -->
             <ProfilePopup
@@ -554,6 +569,7 @@ export default {
     'pubKeyIsValid',
     'profileType',
     'teamMembers',
+    'sectionsOrder',
   ],
   mixins: [utils],
   components: {
@@ -578,6 +594,9 @@ export default {
   },
   computed: {
     ...mapState(['theme']),
+    defaultSectionsOrder() {
+      return ['contact', 'primaryActions', 'secondaryActions', 'featured', 'teamMembers']
+    },
     getFullname() {
       let fn = this.genInfo.fname
       let ln = this.genInfo.lname

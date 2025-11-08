@@ -186,8 +186,14 @@
     <div class="md:grid md:grid-cols-2">
       <div class="px-4 mt-32">
         <div ref="create" id="step-1" class="pt-8">
-          <h2 class="font-extrabold text-2xl">Header attachments</h2>
-          <div class="stepC">
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-1')"
+          >
+            <span>Header attachments</span>
+            <span class="text-xl">{{ collapsedSections['step-1'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-1']" class="stepC">
             <Attachment
               :content="images"
               type="logo"
@@ -211,7 +217,14 @@
           </div>
         </div>
         <div id="step-2" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Contact information</h2>
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-2')"
+          >
+            <span>Contact information</span>
+            <span class="text-xl">{{ collapsedSections['step-2'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-2']">
           <Attachment
             :content="images"
             type="photo"
@@ -426,9 +439,17 @@
               placeholder="Paste public key block here"
             ></textarea>
           </div>
+          </div>
         </div>
         <div id="step-3" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Primary actions</h2>
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-3')"
+          >
+            <span>Primary actions</span>
+            <span class="text-xl">{{ collapsedSections['step-3'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-3']">
           <draggable
             v-model="primaryActions"
             handle=".drag"
@@ -530,9 +551,17 @@
               </button>
             </div>
           </div>
+          </div>
         </div>
         <div id="step-4" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Secondary actions</h2>
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-4')"
+          >
+            <span>Secondary actions</span>
+            <span class="text-xl">{{ collapsedSections['step-4'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-4']">
           <draggable
             v-model="secondaryActions"
             handle=".drag"
@@ -634,12 +663,19 @@
               </button>
             </div>
           </div>
+          </div>
           <!-- class="stepC actions mt-6 border-gray-800"
             :class="{ 'border-t pt-6': secondaryActions.length }" -->
         </div>
         <div id="step-5" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Featured content</h2>
-          <div class="stepC">
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-5')"
+          >
+            <span>Featured content</span>
+            <span class="text-xl">{{ collapsedSections['step-5'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-5']" class="stepC">
             <draggable
               v-model="featured"
               handle=".drag"
@@ -688,8 +724,14 @@
           </div>
         </div>
         <div id="step-6" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Footer credit</h2>
-          <div class="stepC mt-6">
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-6')"
+          >
+            <span>Footer credit</span>
+            <span class="text-xl">{{ collapsedSections['step-6'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-6']" class="stepC mt-6">
             <div class="flex items-center">
               <div
                 class="
@@ -755,8 +797,14 @@
           </div>
         </div>
         <div id="step-7" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Themes</h2>
-          <div class="stepC mt-3 flex flex-wrap">
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-7')"
+          >
+            <span>Themes</span>
+            <span class="text-xl">{{ collapsedSections['step-7'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-7']" class="stepC mt-3 flex flex-wrap">
             <button
               @click="changeTheme(1)"
               class="
@@ -823,8 +871,14 @@
           </div>
         </div>
         <div id="step-8" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Colours</h2>
-          <div class="stepC">
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-8')"
+          >
+            <span>Colours</span>
+            <span class="text-xl">{{ collapsedSections['step-8'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-8']" class="stepC">
             <Colour name="logoBg" label="Header background" :colors="colors" />
             <Colour name="mainBg" label="Main background" :colors="colors" />
             <Colour
@@ -840,7 +894,14 @@
           </div>
         </div>
         <div id="step-9" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Fonts</h2>
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-9')"
+          >
+            <span>Fonts</span>
+            <span class="text-xl">{{ collapsedSections['step-9'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-9']">
           <div class="stepC mt-6">
             <label for="font-link" class="ml-4">Web font embed code</label>
             <textarea
@@ -898,10 +959,17 @@
             sure to get the embed code for both regular and bold font variants
             from the same font family.
           </p>
+          </div>
         </div>
         <div id="step-10" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Analytics</h2>
-          <div class="stepC mt-6">
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-10')"
+          >
+            <span>Analytics</span>
+            <span class="text-xl">{{ collapsedSections['step-10'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-10']" class="stepC mt-6">
             <label for="tracking-code" class="ml-4">Tracking code</label>
             <textarea
               id="tracking-code"
@@ -933,8 +1001,14 @@
           </div>
         </div>
         <div id="step-11" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Hosting</h2>
-          <div class="stepC mt-6">
+          <h2
+            class="font-extrabold text-2xl flex items-center justify-between cursor-pointer hover:text-emerald-500 transition-colors duration-200"
+            @click="toggleSection('step-11')"
+          >
+            <span>Hosting</span>
+            <span class="text-xl">{{ collapsedSections['step-11'] ? '▼' : '▲' }}</span>
+          </h2>
+          <div v-show="!collapsedSections['step-11']" class="stepC mt-6">
             <label for="hosted-url" class="ml-4">Hosted card URL</label>
             <input
               spellcheck="false"
@@ -1086,6 +1160,19 @@ export default {
 
   data() {
     return {
+      collapsedSections: {
+        'step-1': false,
+        'step-2': false,
+        'step-3': false,
+        'step-4': false,
+        'step-5': false,
+        'step-6': false,
+        'step-7': false,
+        'step-8': false,
+        'step-9': false,
+        'step-10': false,
+        'step-11': false,
+      },
       downloadCheckList: [
         {
           label:
@@ -1845,6 +1932,9 @@ export default {
   },
   methods: {
     ...mapActions(['changeTheme']),
+    toggleSection(sectionId) {
+      this.collapsedSections[sectionId] = !this.collapsedSections[sectionId]
+    },
     togglePreview() {
       this.opening = true
       let c = this.$refs.container

@@ -188,33 +188,45 @@
     <div class="md:grid md:grid-cols-2">
       <div class="px-4 mt-32">
         <div ref="create" id="step-1" class="pt-8">
-          <h2 class="font-extrabold text-2xl">Header attachments</h2>
-          <div class="stepC">
-            <Attachment
-              :content="images"
-              type="logo"
-              :resizeImage="resizeImage"
-              label="Add logo"
-              description="suggested format: svg, png or gif"
-              :showAlert="showAlert"
-            />
-            <Attachment
-              :content="images"
-              type="cover"
-              :resizeImage="resizeImage"
-              label="Add cover photo"
-              description="suggested format: svg, jpeg, png or gif"
-              :showAlert="showAlert"
-            />
-            <p class="mt-6 border p-4 rounded border-gray-700 text-gray-400">
-              Recommended cover photo size is 960 x 640 pixels, with an aspect
-              ratio of 3:2
-            </p>
-          </div>
+          <CollapsibleSection
+            title="Header attachments"
+            :default-expanded="true"
+            heading-tag="h2"
+            title-class="font-extrabold text-2xl"
+            storage-key="section-header-attachments"
+          >
+            <div class="stepC">
+              <Attachment
+                :content="images"
+                type="logo"
+                :resizeImage="resizeImage"
+                label="Add logo"
+                description="suggested format: svg, png or gif"
+                :showAlert="showAlert"
+              />
+              <Attachment
+                :content="images"
+                type="cover"
+                :resizeImage="resizeImage"
+                label="Add cover photo"
+                description="suggested format: svg, jpeg, png or gif"
+                :showAlert="showAlert"
+              />
+              <p class="mt-6 border p-4 rounded border-gray-700 text-gray-400">
+                Recommended cover photo size is 960 x 640 pixels, with an aspect
+                ratio of 3:2
+              </p>
+            </div>
+          </CollapsibleSection>
         </div>
         <div id="step-2" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Contact information</h2>
-
+          <CollapsibleSection
+            title="Contact information"
+            :default-expanded="true"
+            heading-tag="h2"
+            title-class="font-extrabold text-2xl"
+            storage-key="section-contact-info"
+          >
           <!-- Profile Type Selector -->
           <div class="stepC mt-6">
             <label class="ml-4 block mb-2">Profile Type</label>
@@ -462,9 +474,16 @@
               placeholder="Paste public key block here"
             ></textarea>
           </div>
+          </CollapsibleSection>
         </div>
         <div id="step-3" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Primary actions</h2>
+          <CollapsibleSection
+            title="Primary actions"
+            :default-expanded="true"
+            heading-tag="h2"
+            title-class="font-extrabold text-2xl"
+            storage-key="section-primary-actions"
+          >
           <draggable
             v-model="primaryActions"
             handle=".drag"
@@ -566,9 +585,16 @@
               </button>
             </div>
           </div>
+          </CollapsibleSection>
         </div>
         <div id="step-4" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Secondary actions</h2>
+          <CollapsibleSection
+            title="Secondary actions"
+            :default-expanded="true"
+            heading-tag="h2"
+            title-class="font-extrabold text-2xl"
+            storage-key="section-secondary-actions"
+          >
           <draggable
             v-model="secondaryActions"
             handle=".drag"
@@ -672,9 +698,16 @@
           </div>
           <!-- class="stepC actions mt-6 border-gray-800"
             :class="{ 'border-t pt-6': secondaryActions.length }" -->
+          </CollapsibleSection>
         </div>
         <div id="step-5" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Featured content</h2>
+          <CollapsibleSection
+            title="Featured content"
+            :default-expanded="true"
+            heading-tag="h2"
+            title-class="font-extrabold text-2xl"
+            storage-key="section-featured-content"
+          >
           <div class="stepC">
             <draggable
               v-model="featured"
@@ -722,17 +755,25 @@
               Supported media formats: jpeg, png, mp3, mp4, webm and pdf
             </p>
           </div>
+          </CollapsibleSection>
         </div>
 
         <!-- Team Members Section - Only for Business Profiles -->
         <div v-if="profileType === 'business'" id="step-5-5" class="mt-16">
-          <h2 class="font-extrabold text-2xl">Team Members</h2>
+          <CollapsibleSection
+            title="Team Members"
+            :default-expanded="true"
+            heading-tag="h2"
+            title-class="font-extrabold text-2xl"
+            storage-key="section-team-members"
+          >
           <p class="mt-4 text-gray-400">
             Add team members or employees to your business profile. Visitors can click on team members to view their individual profiles.
           </p>
           <div class="stepC mt-6">
             <TeamMemberEditor v-model="teamMembers" />
           </div>
+          </CollapsibleSection>
         </div>
 
         <div id="step-6" class="mt-16">
@@ -1105,6 +1146,7 @@ import Help from '@/components/Help'
 import Footer from '@/components/Footer'
 import Cropper from '@/components/Cropper'
 import TeamMemberEditor from '@/components/TeamMemberEditor'
+import CollapsibleSection from '@/components/CollapsibleSection'
 
 import Vcard from '@/components/Vcard'
 import JSZip from 'jszip'
@@ -1132,6 +1174,7 @@ export default {
     Vcard,
     draggable,
     TeamMemberEditor,
+    CollapsibleSection,
   },
 
   data() {

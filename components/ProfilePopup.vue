@@ -39,14 +39,15 @@
                 rel="noopener noreferrer"
                 class="profile-popup-action-link"
               >
-                <div class="profile-popup-action-icon">
+                <div class="profile-popup-action-icon" :style="{ backgroundColor: action.iconBgColor }">
                   <div
                     class="icon"
+                    :style="{ fill: action.iconColor || 'currentColor' }"
                     v-html="require(`~/assets/icons/${action.icon}.svg?include`)"
                   ></div>
                 </div>
                 <div class="profile-popup-action-text">
-                  <div class="profile-popup-action-name">{{ action.name }}</div>
+                  <div v-if="action.showTitle !== false" class="profile-popup-action-name">{{ action.name }}</div>
                   <div v-if="action.value" class="profile-popup-action-value">{{ action.value }}</div>
                 </div>
               </a>

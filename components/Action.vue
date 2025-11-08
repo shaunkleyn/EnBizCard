@@ -4,20 +4,22 @@
       <button class="py-1 pr-1 shrink-0 focus:outline-none drag cursor-move" tabindex="-1">
         <div class="w-6 h-6" v-html="require(`~/assets/icons/drag.svg?include`)"></div>
       </button>
-      <div
-        class="p-3 shrink-0 rounded-l"
+      <button
+        class="p-3 shrink-0 rounded-l cursor-pointer hover:opacity-80 transition-opacity duration-200"
         :style="{
-          background: `${name == 'secondaryActions' ? item.color : buttonBg
-            }`,
+          background: `${name == 'secondaryActions' ? item.color : (item.iconBgColor || buttonBg)}`,
         }"
-        :title="item.name"
+        :title="'Click to change icon'"
+        @click="openIconPicker"
+        tabindex="-1"
       >
         <div
           class="w-6 h-6"
           :class="name == 'secondaryActions' ? null : 'action'"
+          :style="{ fill: item.iconColor || 'inherit' }"
           v-html="getSVG(item)"
         ></div>
-      </div>
+      </button>
       <!-- // TODO show title content when input is focused. -->
       <div class="w-full">
         <input
@@ -41,8 +43,61 @@
     </div>
 
     <!-- Display format options for primary actions -->
-    <div v-if="name === 'primaryActions'" class="ml-12 mt-2 p-3 bg-gray-900 rounded">
-      <div class="mb-2">
+    <div v-if="name === 'primaryActions'" class="ml-12 mt-2 p-3 bg-gray-900 rounded space-y-3">
+      <!-- Icon Customization -->
+      <div class="pb-3 border-b border-gray-700">
+        <h4 class="text-sm font-medium text-gray-300 mb-2">Icon Customization</h4>
+
+        <div class="grid grid-cols-2 gap-2 mb-2">
+          <div>
+            <label class="text-xs text-gray-400 mb-1 block">Icon Color:</label>
+            <div class="flex items-center gap-2">
+              <input
+                v-model="type[index].iconColor"
+                type="color"
+                class="w-10 h-8 rounded border border-gray-600 cursor-pointer bg-black"
+              />
+              <input
+                v-model="type[index].iconColor"
+                type="text"
+                placeholder="#FFFFFF"
+                class="flex-1 px-2 py-1 text-xs bg-black text-white rounded border border-gray-600 focus:outline-none focus:border-gray-400"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs text-gray-400 mb-1 block">Background Color:</label>
+            <div class="flex items-center gap-2">
+              <input
+                v-model="type[index].iconBgColor"
+                type="color"
+                class="w-10 h-8 rounded border border-gray-600 cursor-pointer bg-black"
+              />
+              <input
+                v-model="type[index].iconBgColor"
+                type="text"
+                placeholder="#000000"
+                class="flex-1 px-2 py-1 text-xs bg-black text-white rounded border border-gray-600 focus:outline-none focus:border-gray-400"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs text-gray-400 mb-1 flex items-center">
+            <input
+              type="checkbox"
+              v-model="type[index].showTitle"
+              class="mr-2"
+            />
+            Show title label ({{ item.name }})
+          </label>
+        </div>
+      </div>
+
+      <!-- Display Format -->
+      <div>
         <label class="text-sm text-gray-400 mb-1 block">Display Format:</label>
         <select
           v-model="type[index].displayFormat"
@@ -76,16 +131,56 @@
         </div>
       </div>
     </div>
+
+    <!-- Icon Picker Modal -->
+    <IconPicker
+      :show="showIconPicker"
+      :current-icon="item.icon"
+      @select="onIconSelect"
+      @close="showIconPicker = false"
+    />
   </div>
 </template>
 
 <script>
 import utils from '@/mixins/utils'
+import IconPicker from './IconPicker.vue'
+
 export default {
+  components: {
+    IconPicker,
+  },
   props: ['name', 'item', 'index', 'type', 'buttonBg', 'removeAction'],
   mixins: [utils],
+  data() {
+    return {
+      showIconPicker: false,
+    }
+  },
   mounted() {
     this.$refs.input.focus()
+    // Initialize default values if not set
+    if (this.name === 'primaryActions') {
+      if (!this.type[this.index].iconColor) {
+        this.$set(this.type[this.index], 'iconColor', '#ffffff')
+      }
+      if (!this.type[this.index].iconBgColor) {
+        this.$set(this.type[this.index], 'iconBgColor', this.buttonBg || '#000000')
+      }
+      if (this.type[this.index].showTitle === undefined) {
+        this.$set(this.type[this.index], 'showTitle', true)
+      }
+    }
+  },
+  methods: {
+    openIconPicker() {
+      if (this.name === 'primaryActions') {
+        this.showIconPicker = true
+      }
+    },
+    onIconSelect(icon) {
+      this.$set(this.type[this.index], 'icon', icon)
+    },
   },
 }
 </script>

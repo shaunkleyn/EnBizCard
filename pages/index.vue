@@ -67,6 +67,7 @@
         :pubKeyIsValid="pubKeyIsValid"
         :profileType="profileType"
         :teamMembers="teamMembers"
+        :sectionsOrder="sectionsOrder"
       />
     </transition>
 
@@ -186,7 +187,7 @@
       </p>
     </div>
     <div class="md:grid md:grid-cols-2">
-      <div class="px-4 mt-32">
+      <div class="px-4 mt-32 sections-container">
         <div ref="create" id="step-1" class="pt-8">
           <CollapsibleSection
             title="Header attachments"
@@ -219,9 +220,26 @@
             </div>
           </CollapsibleSection>
         </div>
-        <div id="step-2" class="mt-16">
+
+        <!-- Draggable reorderable sections -->
+        <draggable
+          v-model="sectionsOrder"
+          handle=".section-drag"
+          animation="150"
+          ghostClass="ghost-section"
+          class="draggable-sections"
+        >
+          <transition-group type="transition" name="section-list">
+        <div
+          v-for="sectionId in sectionsOrder"
+          :key="sectionId"
+          :data-section-id="sectionId"
+          class="mt-16"
+        >
+          <div v-if="sectionId === 'contact'" id="step-2">
           <CollapsibleSection
             title="Contact information"
+            :draggable="true"
             :default-expanded="true"
             heading-tag="h2"
             title-class="font-extrabold text-2xl"
@@ -475,10 +493,12 @@
             ></textarea>
           </div>
           </CollapsibleSection>
-        </div>
-        <div id="step-3" class="mt-16">
+          </div>
+
+          <div v-if="sectionId === 'primaryActions'" id="step-3">
           <CollapsibleSection
             title="Primary actions"
+            :draggable="true"
             :default-expanded="true"
             heading-tag="h2"
             title-class="font-extrabold text-2xl"
@@ -586,10 +606,12 @@
             </div>
           </div>
           </CollapsibleSection>
-        </div>
-        <div id="step-4" class="mt-16">
+          </div>
+
+          <div v-if="sectionId === 'secondaryActions'" id="step-4">
           <CollapsibleSection
             title="Secondary actions"
+            :draggable="true"
             :default-expanded="true"
             heading-tag="h2"
             title-class="font-extrabold text-2xl"
@@ -699,10 +721,12 @@
           <!-- class="stepC actions mt-6 border-gray-800"
             :class="{ 'border-t pt-6': secondaryActions.length }" -->
           </CollapsibleSection>
-        </div>
-        <div id="step-5" class="mt-16">
+          </div>
+
+          <div v-if="sectionId === 'featured'" id="step-5">
           <CollapsibleSection
             title="Featured content"
+            :draggable="true"
             :default-expanded="true"
             heading-tag="h2"
             title-class="font-extrabold text-2xl"
@@ -756,12 +780,13 @@
             </p>
           </div>
           </CollapsibleSection>
-        </div>
+          </div>
 
-        <!-- Team Members Section - Only for Business Profiles -->
-        <div v-if="profileType === 'business'" id="step-5-5" class="mt-16">
+          <!-- Team Members Section - Only for Business Profiles -->
+          <div v-if="sectionId === 'teamMembers' && profileType === 'business'" id="step-5-5">
           <CollapsibleSection
             title="Team Members"
+            :draggable="true"
             :default-expanded="true"
             heading-tag="h2"
             title-class="font-extrabold text-2xl"
@@ -774,7 +799,12 @@
             <TeamMemberEditor v-model="teamMembers" />
           </div>
           </CollapsibleSection>
+          </div>
+
         </div>
+          </transition-group>
+        </draggable>
+        <!-- End of draggable reorderable sections -->
 
         <div id="step-6" class="mt-16">
           <h2 class="font-extrabold text-2xl">Footer credit</h2>
@@ -1123,6 +1153,9 @@
                 :hasLightBG="hasLightBG"
                 :downloadKey="downloadKey"
                 :pubKeyIsValid="pubKeyIsValid"
+                :profileType="profileType"
+                :teamMembers="teamMembers"
+                :sectionsOrder="sectionsOrder"
               />
             </div>
           </div>
@@ -1236,6 +1269,13 @@ export default {
         },
       },
       profileType: 'individual', // 'individual' or 'business'
+      sectionsOrder: [
+        'contact',
+        'primaryActions',
+        'secondaryActions',
+        'featured',
+        'teamMembers',
+      ],
       genInfo: {
         fname: null,
         lname: null,
@@ -2278,3 +2318,33 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.draggable-sections {
+  display: flex;
+  flex-direction: column;
+}
+
+.ghost-section {
+  opacity: 0.5;
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 2px dashed rgba(59, 130, 246, 0.5);
+  border-radius: 0.5rem;
+}
+
+/* Transition animations for section reordering */
+.section-list-move {
+  transition: transform 0.3s ease;
+}
+
+.section-list-enter-active,
+.section-list-leave-active {
+  transition: all 0.3s ease;
+}
+
+.section-list-enter,
+.section-list-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+</style>
